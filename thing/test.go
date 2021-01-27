@@ -1,18 +1,14 @@
 package thing
 
 import (
-	"JetIot/conf"
 	"JetIot/util/Log"
+	"JetIot/util/mysql"
 	"JetIot/util/redis"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"time"
 	//"github.com/jinzhu/gorm"
 )
-
-var DbConn *gorm.DB
 
 type Account struct {
 	Account    string `json:"account"`
@@ -22,18 +18,7 @@ type Account struct {
 	CreateTime string `json:create_time`
 }
 
-func inita() {
-	var err error
-	mysqlUrl := "root:" + conf.Default.MysqlPassword + "@tcp(" + conf.Default.MysqlServer + ":3306)/cloudDB?charset=utf8mb4&parseTime=true"
-	DbConn, err = gorm.Open("mysql", mysqlUrl)
-	if err != nil {
-		panic(err)
-	}
-	//DbConn.AutoMigrate(&Post{}, &Comment{})
-}
-
 func Test(context *gin.Context) {
-	inita()
 	set := redis.Set("time2", "gg")
 	if set != nil {
 		Log.D()(set)
@@ -50,6 +35,6 @@ func Test(context *gin.Context) {
 		CreateTime: format,
 	}
 
-	DbConn.Create(&account)
+	mysql.Create(&account)
 	fmt.Println(account)
 }
