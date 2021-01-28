@@ -1,0 +1,14 @@
+POST http://127.0.0.1:8080/thing/register
+Content-Type: application/json
+
+{
+  "name": "cover",
+  "id": "33322",
+  "components": {
+    "cover": {
+      "name": "cover",
+      "type": "string",
+      "value": "ss"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "redis_server":"127.0.0.1",
+  "redis_server":"101.37.86.133",
   "redis_port":"6379",
   "mysql_server":"101.37.86.133",
   "mysql_port":"3306",

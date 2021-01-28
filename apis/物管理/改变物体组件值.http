@@ -1,0 +1,8 @@
+POST http://127.0.0.1:8080/thing/setThingComponentValue
+Content-Type: application/json
+
+{
+  "id": "33322",
+  "component_name": "cover",
+  "value": "cover"
+}

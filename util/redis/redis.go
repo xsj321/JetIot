@@ -7,20 +7,20 @@ import (
 
 var redisDb *redis.Client
 
-func init() {
+func InitRedis() {
 	redisDb = redis.NewClient(&redis.Options{
-		Addr:     conf.Default.RedisServer, // use default Addr
-		Password: "",                       // no password set
-		DB:       0,                        // use default DB
+		Addr:     conf.Default.RedisServer + ":" + conf.Default.RedisPort, // use default Addr
+		Password: "",                                                      // no password set
+		DB:       0,                                                       // use default DB
 	})
 }
 
 func Set(key string, value interface{}) error {
-	cmd := redisDb.Set(key, value, 0)
-	return cmd.Err()
+	err := redisDb.Set(key, value, 0).Err()
+	return err
 }
 
-func Get(key string) (string, error) {
+func Get(key string) ([]byte, error) {
 	get := redisDb.Get(key)
-	return get.String(), get.Err()
+	return get.Bytes()
 }
