@@ -3,5 +3,10 @@
   "redis_port":"6379",
   "mysql_server":"101.37.86.133",
   "mysql_port":"3306",
-  "mysql_password":"xsj08262334910"
+  "mysql_password":"xsj08262334910",
+  "mqtt_server":"101.37.86.133",
+  "mqtt_port":"1883",
+  "mqtt_client_id":"main_server",
+  "mqtt_user_name":"admin",
+  "mqtt_password":"xsj08262334910"
 }

@@ -13,6 +13,11 @@ type Config_t struct {
 	MysqlServer   string `json:"mysql_server"`
 	MysqlPort     string `json:"mysql_port"`
 	MysqlPassword string `json:"mysql_password"`
+	MqttServer    string `json:"mqtt_server"`
+	MqttPort      string `json:"mqtt_port"`
+	MqttClientID  string `json:"mqtt_client_id"`
+	MqttUserName  string `json:"mqtt_user_name"`
+	MqttPassword  string `json:"mqtt_password"`
 }
 
 var (
