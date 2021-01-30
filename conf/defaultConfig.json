@@ -1,6 +1,7 @@
 {
   "redis_server":"101.37.86.133",
   "redis_port":"6379",
+  "redis_password":"xsj08262334910",
   "mysql_server":"101.37.86.133",
   "mysql_port":"3306",
   "mysql_password":"xsj08262334910",

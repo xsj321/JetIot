@@ -75,6 +75,7 @@ func Replay(topic string, replay interface{}) {
  * @param handle 回调函数
  */
 func RegisterEventHandle(eventId int, eventName string, handle mq.MessageHandler) {
+	Log.I()("注册事件：", eventName, " EVENT_ID：", eventId)
 	handleFunc := handleFunc{
 		funcName: eventName,
 		handle:   handle,
@@ -88,6 +89,7 @@ func eventInit() {
 }
 
 func DealEventHandle(client mq.Client, message mq.Message) {
+	Log.D()("出现事件")
 	payload := struct {
 		EventId int `json:"function_id"`
 	}{}

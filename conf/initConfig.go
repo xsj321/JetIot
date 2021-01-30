@@ -10,6 +10,7 @@ import (
 type Config_t struct {
 	RedisServer   string `json:"redis_server"`
 	RedisPort     string `json:"redis_port"`
+	RedisPassword string `json:"redis_password"`
 	MysqlServer   string `json:"mysql_server"`
 	MysqlPort     string `json:"mysql_port"`
 	MysqlPassword string `json:"mysql_password"`
