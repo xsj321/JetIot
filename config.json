@@ -1,0 +1,13 @@
+{
+  "redis_server":"",
+  "redis_port":"6379",
+  "redis_password":"",
+  "mysql_server":"",
+  "mysql_port":"3306",
+  "mysql_password":"",
+  "mqtt_server":"",
+  "mqtt_port":"1883",
+  "mqtt_client_id":"main_server",
+  "mqtt_user_name":"admin",
+  "mqtt_password":"public"
+}

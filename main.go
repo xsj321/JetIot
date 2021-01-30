@@ -10,12 +10,15 @@ import (
 	"JetIot/util/mysql"
 	"JetIot/util/redis"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/pflag"
 	"os"
 	"os/signal"
 )
 
-func init() {
-	conf.InitConfig("conf/defaultConfig.json")
+var configPath = pflag.StringP("config", "c", "conf/defaultConfig.json", "the config json file path")
+
+func initEvn() {
+	conf.InitConfig(*configPath)
 	mysql.InitDB()
 	redis.InitRedis()
 	mqtt.InitMqttClient()
@@ -49,6 +52,7 @@ func runMqttServer() {
 }
 
 func main() {
+	initEvn()
 	go runHttpServer()
 	go runMqttServer()
 	quit := make(chan os.Signal)

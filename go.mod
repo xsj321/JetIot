@@ -11,5 +11,6 @@ require (
 	github.com/onsi/ginkgo v1.14.2 // indirect
 	github.com/onsi/gomega v1.10.4 // indirect
 	github.com/sirupsen/logrus v1.7.0
+	github.com/spf13/pflag v1.0.5
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
