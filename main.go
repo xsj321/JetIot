@@ -3,12 +3,15 @@ package main
 import (
 	"JetIot/accountSystem"
 	"JetIot/conf"
+	"JetIot/model"
 	"JetIot/thing"
 	"JetIot/util/Log"
 	"JetIot/util/mqtt"
 	"JetIot/util/mysql"
 	"JetIot/util/redis"
 	"github.com/gin-gonic/gin"
+	"os"
+	"os/signal"
 )
 
 func init() {
@@ -19,7 +22,7 @@ func init() {
 	mqtt.Publish("server/status", "restart")
 }
 
-func main() {
+func runHttpServer() {
 	engine := gin.Default()
 
 	//物管理
@@ -38,5 +41,17 @@ func main() {
 	if err != nil {
 		Log.E()(err.Error())
 	}
+}
 
+func runMqttServer() {
+	mqtt.Subscribe("thing/function/register", thing.RegisterThingByMqttHandle)
+	mqtt.RegisterEventHandle(model.EVENT_COMPONENT_CHANGE_VALUE, "更新设备数据", thing.SetThingComponentValueByMqttHandle)
+}
+
+func main() {
+	go runHttpServer()
+	go runMqttServer()
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
 }

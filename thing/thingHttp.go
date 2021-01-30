@@ -1,3 +1,6 @@
+/**
+ * @Description: 通过HTTP对设备进行注册修改等操作
+ */
 package thing
 
 import (

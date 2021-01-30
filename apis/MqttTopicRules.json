@@ -1,0 +1,12 @@
+{
+  "thing": {
+    "function": {
+      "register": "thing/function/register",
+      "register_relay": "thing/function/register/register_relay/$id"
+    },
+    "entity": {
+      "info": "thing/entity/$id",
+      "components": "thing/entity/$id/&componentName"
+    }
+  }
+}
