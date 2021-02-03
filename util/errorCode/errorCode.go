@@ -1,4 +1,4 @@
-package util
+package errorCode
 
 const (
 	ERR_NO_ERROR                    = 0
@@ -42,4 +42,5 @@ const (
 	ERR_DEV_BINDED                  = 38 // 设备已被绑定
 	ERR_ACCOUNT_LOGOUT              = 39 // 账号已被注销
 	ERR_MAX                         = 40
+	ERR_DEVICE_NOT_FIND             = 41
 )

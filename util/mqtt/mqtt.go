@@ -23,15 +23,16 @@ func InitMqttClient() {
 		SetClientID(conf.Default.MqttClientID).
 		SetUsername(conf.Default.MqttUserName).
 		SetPassword(conf.Default.MqttPassword).
-		SetWill("server/will", "lose_connect", 2, true)
+		SetWill("server_will", "lose_connect", 2, false)
 
 	Client = mq.NewClient(opts)
 	if token := Client.Connect(); token.Wait() && token.Error() != nil {
 		Log.E()("初始化Mqtt客户端失败" + token.Error().Error())
 		return
 	}
+	Client.Publish("server_will", 2, true, "server_start")
 	Log.I()("初始化Mqtt客户端完成")
-	eventInit()
+
 }
 
 func Publish(topic string, msg string) {
@@ -68,6 +69,15 @@ func Replay(topic string, replay interface{}) {
 	Publish(topic, string(marshal))
 }
 
+func ReplayToDevice(deviceId string, replay interface{}) {
+	marshal, err := json.Marshal(replay)
+	if err != nil {
+		Log.E()("回复失败" + err.Error())
+		return
+	}
+	Publish("thing/entity/"+deviceId+"/todevice", string(marshal))
+}
+
 /**
  * @Description: 注册订阅事件回调函数
  * @param eventId 事件ID
@@ -75,7 +85,7 @@ func Replay(topic string, replay interface{}) {
  * @param handle 回调函数
  */
 func RegisterEventHandle(eventId int, eventName string, handle mq.MessageHandler) {
-	Log.I()("注册事件：", eventName, " EVENT_ID：", eventId)
+	Log.I()("注册事件：", eventName, "        \t--> EVENT_ID：", eventId)
 	handleFunc := handleFunc{
 		funcName: eventName,
 		handle:   handle,
@@ -83,21 +93,25 @@ func RegisterEventHandle(eventId int, eventName string, handle mq.MessageHandler
 	EventHandleList[eventId] = handleFunc
 }
 
-func eventInit() {
+func EventListenStart() {
 	Log.I()("初始化事件系统")
 	Subscribe("thing/entity/toserver", DealEventHandle)
 }
 
 func DealEventHandle(client mq.Client, message mq.Message) {
-	Log.D()("出现事件")
 	payload := struct {
-		EventId int `json:"function_id"`
+		EventId int `json:"event_id"`
 	}{}
 	err := ShouldBindJSON(message, &payload)
 	if err != nil {
 		Log.E()("解析事件ID错误")
 	}
-	handleFunc := EventHandleList[payload.EventId]
+	Log.D()("出现事件：", payload.EventId)
+	handleFunc, exist := EventHandleList[payload.EventId]
+	if !exist {
+		Log.E()("EevntId：", payload.EventId, " 不存在")
+		return
+	}
 	Log.D()("调用方法: ", handleFunc.funcName)
 	handleFunc.handle(client, message)
 }
