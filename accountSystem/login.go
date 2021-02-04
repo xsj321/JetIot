@@ -1,7 +1,7 @@
 package accountSystem
 
 import (
-	"JetIot/model"
+	"JetIot/model/account"
 	"JetIot/model/response"
 	"JetIot/util/Log"
 	"JetIot/util/errorCode"
@@ -16,7 +16,7 @@ import (
  * @param context gin上下文
  */
 func Login(context *gin.Context) {
-	param := model.Account{}
+	param := account.Account{}
 	err := context.ShouldBindJSON(&param)
 	if err != nil {
 		Log.E()("参数解析错误")
@@ -35,7 +35,7 @@ func Login(context *gin.Context) {
 		))
 		return
 	}
-	resTrue := res.(*model.Account)
+	resTrue := res.(*account.Account)
 	if resTrue.Password == param.Password && resTrue.Account == resTrue.Account {
 		context.JSON(http.StatusOK, response.GetSuccessResponses("登录成功"))
 		return
@@ -47,7 +47,7 @@ func Login(context *gin.Context) {
 }
 
 func Register(context *gin.Context) {
-	param := model.Account{}
+	param := account.Account{}
 	param.CreateTime = time.Now().Format("2006-01-02 15:04:05")
 	err := context.ShouldBindJSON(&param)
 	if err != nil {
@@ -59,7 +59,7 @@ func Register(context *gin.Context) {
 		return
 	}
 
-	res := model.Account{}
+	res := account.Account{}
 	err = mysql.Conn.Table("accounts").Where("account = ?", param.Account).Scan(&res).Error
 	if err != nil {
 		Log.I()(err)

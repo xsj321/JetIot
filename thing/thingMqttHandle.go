@@ -1,9 +1,9 @@
 package thing
 
 import (
-	"JetIot/model"
 	"JetIot/model/event"
 	"JetIot/model/response"
+	"JetIot/model/thingModel"
 	"JetIot/util/Log"
 	"JetIot/util/errorCode"
 	"JetIot/util/mqtt"
@@ -12,8 +12,13 @@ import (
 	mq "github.com/eclipse/paho.mqtt.golang"
 )
 
+/**
+ * @Description: 注册回调
+ * @param client
+ * @param message
+ */
 func RegisterThingByMqttHandle(client mq.Client, message mq.Message) {
-	thing := model.Thing{}
+	thing := thingModel.Thing{}
 	err := mqtt.ShouldBindJSON(message, &thing)
 	replayTopic := "thing/function/register/" + thing.Id
 
@@ -48,7 +53,7 @@ func RegisterThingByMqttHandle(client mq.Client, message mq.Message) {
  * @param context
  */
 func SetThingComponentValueByMqttHandle(client mq.Client, message mq.Message) {
-	ov := model.ThingComponentValueOV{}
+	ov := thingModel.ThingComponentValueOV{}
 	err := mqtt.ShouldBindJSON(message, &ov)
 	if err != nil {
 		Log.E()("参数解析错误" + err.Error())
@@ -75,7 +80,7 @@ func SetThingComponentValueByMqttHandle(client mq.Client, message mq.Message) {
  * @param message 消息对象
  */
 func DeviceOnlineByMqttHandle(client mq.Client, message mq.Message) {
-	ov := model.ThingInitOV{}
+	ov := thingModel.ThingInitOV{}
 	err := mqtt.ShouldBindJSON(message, &ov)
 	if err != nil {
 		Log.E()("参数解析错误" + err.Error())
@@ -107,7 +112,7 @@ func DeviceOnlineByMqttHandle(client mq.Client, message mq.Message) {
  */
 func DeviceOfflineByMqttHandle(client mq.Client, message mq.Message) {
 	Log.D()("遗嘱内容", string(message.Payload()))
-	ov := model.ThingInitOV{}
+	ov := thingModel.ThingInitOV{}
 	err := mqtt.ShouldBindJSON(message, &ov)
 	if err != nil {
 		Log.E()("参数解析错误" + err.Error())

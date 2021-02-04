@@ -1,4 +1,4 @@
-package model
+package thingModel
 
 import "JetIot/util/Log"
 

@@ -4,10 +4,12 @@
 package thing
 
 import (
-	"JetIot/model"
+	"JetIot/model/account"
 	"JetIot/model/response"
+	"JetIot/model/thingModel"
 	"JetIot/util/Log"
 	"JetIot/util/errorCode"
+	"JetIot/util/mysql"
 	"JetIot/util/redis"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -19,7 +21,7 @@ import (
  * @param context
  */
 func RegisterThing(context *gin.Context) {
-	thing := model.Thing{}
+	thing := thingModel.Thing{}
 	err := context.ShouldBindJSON(&thing)
 	if err != nil {
 		Log.E()("参数解析错误")
@@ -50,7 +52,7 @@ func RegisterThing(context *gin.Context) {
  * @param context
  */
 func SetThingComponentValue(context *gin.Context) {
-	ov := model.ThingComponentValueOV{}
+	ov := thingModel.ThingComponentValueOV{}
 	err := context.ShouldBindJSON(&ov)
 	if err != nil {
 		Log.E()("参数解析错误" + err.Error())
@@ -84,8 +86,53 @@ func SetThingComponentValue(context *gin.Context) {
 	context.JSON(http.StatusOK, response.GetSuccessResponses("修改完成"))
 }
 
+/**
+ * @Description: 绑定设备
+ * @param context
+ */
+func BindingDevice(context *gin.Context) {
+	deviceOV := account.BindingDevice{}
+	err := context.ShouldBindJSON(&deviceOV)
+	if err != nil {
+		Log.E()("参数解析错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	//验证设备是否被绑定
+	isBinding := isDeviceBinding(deviceOV.DeviceId)
+
+	if isBinding {
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"设备已经被绑定",
+			errorCode.ERR_DEV_BINDED,
+		))
+
+		return
+	}
+
+	deviceOV.CreateTime = mysql.GetFormatNowTime()
+	err = mysql.Conn.Create(&deviceOV).Error
+	if err != nil {
+		Log.E()("设备保存错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"设备保存错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+	context.JSON(http.StatusOK, response.GetSuccessResponses(
+		"设备绑定完成",
+		errorCode.ERR_NO_ERROR,
+	))
+
+}
+
 func GetThingComponentValue(context *gin.Context) {
-	ov := model.ThingComponentValueOV{}
+	ov := thingModel.ThingComponentValueOV{}
 	err := context.ShouldBindJSON(&ov)
 	if err != nil {
 		Log.E()("参数解析错误" + err.Error())

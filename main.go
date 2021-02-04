@@ -34,6 +34,7 @@ func runHttpServer() {
 	thingGroup.POST("register", thing.RegisterThing)
 	thingGroup.POST("setThingComponentValue", thing.SetThingComponentValue)
 	thingGroup.POST("getThingComponentValue", thing.GetThingComponentValue)
+	thingGroup.POST("bindingDevice", thing.BindingDevice)
 
 	//账号管理
 	accountGroup := engine.Group("account")
@@ -48,7 +49,7 @@ func runHttpServer() {
 
 func runMqttServer() {
 	mqtt.Subscribe("thing/function/register", thing.RegisterThingByMqttHandle)
-	mqtt.RegisterEventHandle(event.EVENT_COMPONENT_CHANGE_VALUE, "更新设备数据", thing.SetThingComponentValueByMqttHandle)
+	mqtt.RegisterEventHandle(event.EVENT_COMPONENT_CHANGE_VALUE, "更新设备组件数据", thing.SetThingComponentValueByMqttHandle)
 	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_ONLIONE, "设备上线初始化", thing.DeviceOnlineByMqttHandle)
 	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_OFFLIONE, "设备离线遗嘱", thing.DeviceOfflineByMqttHandle)
 	mqtt.EventListenStart()

@@ -1,14 +1,16 @@
 package thing
 
 import (
-	"JetIot/model"
+	"JetIot/model/account"
+	"JetIot/model/thingModel"
 	"JetIot/util/Log"
+	"JetIot/util/mysql"
 	"JetIot/util/redis"
 	"encoding/json"
 )
 
-func LoadThing(id string) (*model.Thing, error) {
-	thing := model.Thing{}
+func LoadThing(id string) (*thingModel.Thing, error) {
+	thing := thingModel.Thing{}
 	get, err := redis.Get("thing:" + id)
 	if err != nil {
 		Log.E()("查找物体错误" + err.Error())
@@ -24,7 +26,7 @@ func LoadThing(id string) (*model.Thing, error) {
 	return &thing, nil
 }
 
-func commit(thing *model.Thing) error {
+func commit(thing *thingModel.Thing) error {
 	marshal, _ := json.Marshal(*thing)
 	Log.D()(string(marshal))
 	//保存到缓存库
@@ -64,4 +66,21 @@ func setDeviceOnlineStatus(id string, isOnline bool) error {
 		}
 	}
 	return nil
+}
+
+/**
+ * @Description: 查询设备是否绑定
+ * @param id 设备ID
+ * @return bool 是否被绑定
+ */
+func isDeviceBinding(id string) bool {
+	device := account.BindingDevice{}
+	err := mysql.Conn.Select("account").Table("binding_devices").Where("device_id = ?", id).Scan(&device).Error
+	if err != nil {
+		Log.I()("未找到数据，设备", id, "未绑定", err)
+		return false
+	} else {
+		Log.I()("设备", id, "已经绑定用户：", device.Account)
+		return true
+	}
 }

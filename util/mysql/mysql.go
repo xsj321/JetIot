@@ -4,6 +4,7 @@ import (
 	"JetIot/conf"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"time"
 )
 
 var Conn *gorm.DB
@@ -40,4 +41,13 @@ func Find(table string, query interface{}, columns ...string) (interface{}, erro
 		err = Conn.Table(table).Select(columns).Where(query).Scan(query).Error
 	}
 	return query, err
+}
+
+/**
+ * @Description: 获取数据库格式化时间
+ * @return string
+ */
+func GetFormatNowTime() string {
+	format := time.Now().Format("2006-01-02 15:04:05")
+	return format
 }
