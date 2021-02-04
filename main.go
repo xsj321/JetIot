@@ -38,6 +38,7 @@ func runHttpServer() {
 	thingGroup.POST("getThingComponentValue", appServer.GetThingComponentValue)
 	thingGroup.POST("bindingDevice", appServer.BindingDevice)
 	thingGroup.POST("unbindingDevice", appServer.UnBindingDevice)
+	thingGroup.POST("getDeviceListByAccount", appServer.GetDeviceInfoListByAccount)
 
 	//账号管理
 	accountGroup := engine.Group("account")

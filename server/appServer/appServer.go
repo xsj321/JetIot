@@ -174,6 +174,58 @@ func BindingDevice(context *gin.Context) {
 
 }
 
+func GetDeviceInfoListByAccount(context *gin.Context) {
+	ov := account.Account{}
+	err := context.ShouldBindJSON(&ov)
+	if err != nil {
+		Log.E()("参数解析错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	var deviceList []account.BindingDevice
+	err = mysql.Conn.Select("device_id").Table("binding_devices").Where("account = ?", ov.Account).Scan(&deviceList).Error
+	if err != nil {
+		Log.E()("查询设备列表失败", err)
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"查询设备列表失败",
+			errorCode.ERR_MYSQL_FAILED,
+		))
+		return
+	}
+	if len(deviceList) == 0 {
+		Log.D()("设备列表为空", err)
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"设备列表为空",
+			errorCode.ERR_DEVICE_LIST_EMPTY,
+		))
+		return
+	}
+
+	var thingList []thingModel.Thing
+
+	for _, s := range deviceList {
+		thing, err := util.LoadThing(s.DeviceId)
+		if err != nil {
+			Log.E()("加载错误" + err.Error())
+			context.JSON(http.StatusOK, response.GetFailResponses(
+				"加载错误",
+				errorCode.ERR_SVR_INTERNAL,
+			))
+			return
+		}
+		thingList = append(thingList, *thing)
+	}
+
+	context.JSON(http.StatusOK, response.GetSuccessResponses(
+		"设备列表获取成功",
+		thingList,
+	))
+}
+
 func GetThingComponentValue(context *gin.Context) {
 	ov := thingModel.ThingComponentValueOV{}
 	err := context.ShouldBindJSON(&ov)
