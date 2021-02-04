@@ -1,4 +1,4 @@
-POST http://127.0.0.1:8080/thing/setThingComponentValue
+POST http://127.0.0.1:8080/app/thing/setThingComponentValue
 Content-Type: application/json
 
 {

@@ -1,4 +1,4 @@
-package thing
+package util
 
 import (
 	"JetIot/model/account"
@@ -11,7 +11,7 @@ import (
 
 func LoadThing(id string) (*thingModel.Thing, error) {
 	thing := thingModel.Thing{}
-	get, err := redis.Get("thing:" + id)
+	get, err := redis.Get("thingServer:" + id)
 	if err != nil {
 		Log.E()("查找物体错误" + err.Error())
 		return &thing, err
@@ -26,11 +26,11 @@ func LoadThing(id string) (*thingModel.Thing, error) {
 	return &thing, nil
 }
 
-func commit(thing *thingModel.Thing) error {
+func Commit(thing *thingModel.Thing) error {
 	marshal, _ := json.Marshal(*thing)
 	Log.D()(string(marshal))
 	//保存到缓存库
-	err := redis.Set("thing:"+thing.Id, string(marshal))
+	err := redis.Set("thingServer:"+thing.Id, string(marshal))
 	if err != nil {
 		Log.E()("保存到缓存库错误" + err.Error())
 		return err
@@ -38,8 +38,8 @@ func commit(thing *thingModel.Thing) error {
 	return nil
 }
 
-func isRegisterThing(id string) bool {
-	_, err := redis.Get("thing:" + id)
+func IsRegisterThing(id string) bool {
+	_, err := redis.Get("thingServer:" + id)
 	if err != nil {
 		return false
 	}
@@ -51,15 +51,15 @@ func isRegisterThing(id string) bool {
  * @param id 设备id
  * @param isOnline 是否在线
  */
-func setDeviceOnlineStatus(id string, isOnline bool) error {
+func SetDeviceOnlineStatus(id string, isOnline bool) error {
 	if isOnline {
-		err := redis.Set("thing:online_status:"+id, 1)
+		err := redis.Set("thingServer:online_status:"+id, 1)
 		if err != nil {
 			Log.E()(id, "更新设备状态错误", err)
 			return err
 		}
 	} else {
-		err := redis.Set("thing:online_status:"+id, 0)
+		err := redis.Set("thingServer:online_status:"+id, 0)
 		if err != nil {
 			Log.E()(id, "更新设备状态错误", err)
 			return err
@@ -73,7 +73,7 @@ func setDeviceOnlineStatus(id string, isOnline bool) error {
  * @param id 设备ID
  * @return bool 是否被绑定
  */
-func isDeviceBinding(id string) bool {
+func IsDeviceBinding(id string) bool {
 	device := account.BindingDevice{}
 	err := mysql.Conn.Select("account").Table("binding_devices").Where("device_id = ?", id).Scan(&device).Error
 	if err != nil {

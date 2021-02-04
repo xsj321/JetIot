@@ -75,7 +75,7 @@ func ReplayToDevice(deviceId string, replay interface{}) {
 		Log.E()("回复失败" + err.Error())
 		return
 	}
-	Publish("thing/entity/"+deviceId+"/todevice", string(marshal))
+	Publish("thingServer/entity/"+deviceId+"/todevice", string(marshal))
 }
 
 /**
@@ -95,7 +95,7 @@ func RegisterEventHandle(eventId int, eventName string, handle mq.MessageHandler
 
 func EventListenStart() {
 	Log.I()("初始化事件系统")
-	Subscribe("thing/entity/toserver", DealEventHandle)
+	Subscribe("thingServer/entity/toserver", DealEventHandle)
 }
 
 func DealEventHandle(client mq.Client, message mq.Message) {

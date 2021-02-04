@@ -24,3 +24,8 @@ func Get(key string) ([]byte, error) {
 	get := redisDb.Get(key)
 	return get.Bytes()
 }
+
+func Del(key string) error {
+	err := redisDb.Del(key).Err()
+	return err
+}

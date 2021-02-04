@@ -1,12 +1,13 @@
 /**
  * @Description: 通过HTTP对设备进行注册修改等操作
  */
-package thing
+package appServer
 
 import (
 	"JetIot/model/account"
 	"JetIot/model/response"
 	"JetIot/model/thingModel"
+	"JetIot/util"
 	"JetIot/util/Log"
 	"JetIot/util/errorCode"
 	"JetIot/util/mysql"
@@ -35,7 +36,7 @@ func RegisterThing(context *gin.Context) {
 	marshal, _ := json.Marshal(thing)
 
 	//保存到缓存库
-	err = redis.Set("thing:"+thing.Id, string(marshal))
+	err = redis.Set("thingServer:"+thing.Id, string(marshal))
 	if err != nil {
 		Log.E()("保存到缓存库错误" + err.Error())
 		context.JSON(http.StatusOK, response.GetFailResponses(
@@ -63,7 +64,7 @@ func SetThingComponentValue(context *gin.Context) {
 		return
 	}
 
-	thing, err := LoadThing(ov.Id)
+	thing, err := util.LoadThing(ov.Id)
 	if err != nil {
 		Log.E()("加载错误" + err.Error())
 		context.JSON(http.StatusOK, response.GetFailResponses(
@@ -74,7 +75,7 @@ func SetThingComponentValue(context *gin.Context) {
 	}
 
 	thing.Components[ov.ComponentName].Do(ov.Value)
-	err = commit(thing)
+	err = util.Commit(thing)
 	if err != nil {
 		Log.E()("更新缓存错误" + err.Error())
 		context.JSON(http.StatusOK, response.GetFailResponses(
@@ -84,6 +85,48 @@ func SetThingComponentValue(context *gin.Context) {
 		return
 	}
 	context.JSON(http.StatusOK, response.GetSuccessResponses("修改完成"))
+}
+
+/**
+ * @Description: 解绑设备
+ * @param context
+ */
+func UnBindingDevice(context *gin.Context) {
+	deviceOV := account.BindingDevice{}
+	err := context.ShouldBindJSON(&deviceOV)
+	if err != nil {
+		Log.E()("参数解析错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	err = redis.Del("thing:" + deviceOV.DeviceId)
+	if err != nil {
+		Log.E()("删除设备失败", err)
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"删除设备失败",
+			errorCode.ERR_REDIS_FAILED,
+		))
+		return
+	}
+
+	err = mysql.Conn.Delete(&deviceOV).Error
+	if err != nil {
+		Log.E()("删除设备失败", err)
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"删除设备失败",
+			errorCode.ERR_MYSQL_FAILED,
+		))
+		return
+	}
+
+	context.JSON(http.StatusOK, response.GetSuccessResponses(
+		"设备解绑完成",
+		errorCode.ERR_NO_ERROR,
+	))
 }
 
 /**
@@ -103,7 +146,7 @@ func BindingDevice(context *gin.Context) {
 	}
 
 	//验证设备是否被绑定
-	isBinding := isDeviceBinding(deviceOV.DeviceId)
+	isBinding := util.IsDeviceBinding(deviceOV.DeviceId)
 
 	if isBinding {
 		context.JSON(http.StatusOK, response.GetFailResponses(
@@ -143,7 +186,7 @@ func GetThingComponentValue(context *gin.Context) {
 		return
 	}
 
-	thing, err := LoadThing(ov.Id)
+	thing, err := util.LoadThing(ov.Id)
 	if err != nil {
 		Log.E()("加载错误" + err.Error())
 		context.JSON(http.StatusOK, response.GetFailResponses(

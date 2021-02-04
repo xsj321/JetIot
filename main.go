@@ -1,10 +1,10 @@
 package main
 
 import (
-	"JetIot/accountSystem"
 	"JetIot/conf"
 	"JetIot/model/event"
-	"JetIot/thing"
+	"JetIot/server/appServer"
+	"JetIot/server/thingServer"
 	"JetIot/util/Log"
 	"JetIot/util/mqtt"
 	"JetIot/util/mysql"
@@ -28,18 +28,21 @@ func initEvn() {
 func runHttpServer() {
 	engine := gin.Default()
 
+	//app
+	appGroup := engine.Group("app")
+
 	//物管理
-	thingGroup := engine.Group("thing")
-	thingGroup.GET("test", thing.Test)
-	thingGroup.POST("register", thing.RegisterThing)
-	thingGroup.POST("setThingComponentValue", thing.SetThingComponentValue)
-	thingGroup.POST("getThingComponentValue", thing.GetThingComponentValue)
-	thingGroup.POST("bindingDevice", thing.BindingDevice)
+	thingGroup := appGroup.Group("thing")
+	thingGroup.POST("register", appServer.RegisterThing)
+	thingGroup.POST("setThingComponentValue", appServer.SetThingComponentValue)
+	thingGroup.POST("getThingComponentValue", appServer.GetThingComponentValue)
+	thingGroup.POST("bindingDevice", appServer.BindingDevice)
+	thingGroup.POST("unbindingDevice", appServer.UnBindingDevice)
 
 	//账号管理
 	accountGroup := engine.Group("account")
-	accountGroup.POST("login", accountSystem.Login)
-	accountGroup.POST("register", accountSystem.Register)
+	accountGroup.POST("login", appServer.Login)
+	accountGroup.POST("register", appServer.Register)
 	err := engine.Run()
 
 	if err != nil {
@@ -48,10 +51,10 @@ func runHttpServer() {
 }
 
 func runMqttServer() {
-	mqtt.Subscribe("thing/function/register", thing.RegisterThingByMqttHandle)
-	mqtt.RegisterEventHandle(event.EVENT_COMPONENT_CHANGE_VALUE, "更新设备组件数据", thing.SetThingComponentValueByMqttHandle)
-	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_ONLIONE, "设备上线初始化", thing.DeviceOnlineByMqttHandle)
-	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_OFFLIONE, "设备离线遗嘱", thing.DeviceOfflineByMqttHandle)
+	mqtt.Subscribe("thingServer/function/register", thingServer.RegisterThingByMqttHandle)
+	mqtt.RegisterEventHandle(event.EVENT_COMPONENT_CHANGE_VALUE, "更新设备组件数据", thingServer.SetThingComponentValueByMqttHandle)
+	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_ONLIONE, "设备上线初始化", thingServer.DeviceOnlineByMqttHandle)
+	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_OFFLIONE, "设备离线遗嘱", thingServer.DeviceOfflineByMqttHandle)
 	mqtt.EventListenStart()
 }
 

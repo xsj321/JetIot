@@ -1,9 +1,10 @@
-package thing
+package thingServer
 
 import (
 	"JetIot/model/event"
 	"JetIot/model/response"
 	"JetIot/model/thingModel"
+	"JetIot/util"
 	"JetIot/util/Log"
 	"JetIot/util/errorCode"
 	"JetIot/util/mqtt"
@@ -20,7 +21,7 @@ import (
 func RegisterThingByMqttHandle(client mq.Client, message mq.Message) {
 	thing := thingModel.Thing{}
 	err := mqtt.ShouldBindJSON(message, &thing)
-	replayTopic := "thing/function/register/" + thing.Id
+	replayTopic := "thingServer/function/register/" + thing.Id
 
 	if err != nil {
 		Log.E()("参数解析错误")
@@ -35,7 +36,7 @@ func RegisterThingByMqttHandle(client mq.Client, message mq.Message) {
 	marshal, _ := json.Marshal(thing)
 
 	//保存到缓存库
-	err = redis.Set("thing:"+thing.Id, string(marshal))
+	err = redis.Set("thingServer:"+thing.Id, string(marshal))
 	if err != nil {
 		Log.E()("保存到缓存库错误" + err.Error())
 		mqtt.Replay(replayTopic, response.GetMqttFailResponses(
@@ -60,14 +61,14 @@ func SetThingComponentValueByMqttHandle(client mq.Client, message mq.Message) {
 		return
 	}
 
-	thing, err := LoadThing(ov.Id)
+	thing, err := util.LoadThing(ov.Id)
 	if err != nil {
 		Log.E()("加载错误" + err.Error())
 		return
 	}
 
 	thing.Components[ov.ComponentName].Do(ov.Value)
-	err = commit(thing)
+	err = util.Commit(thing)
 	if err != nil {
 		Log.E()("更新缓存错误" + err.Error())
 		return
@@ -87,10 +88,10 @@ func DeviceOnlineByMqttHandle(client mq.Client, message mq.Message) {
 		return
 	}
 
-	isReg := isRegisterThing(ov.Id)
+	isReg := util.IsRegisterThing(ov.Id)
 	if isReg {
 		Log.D()("设备已经注册")
-		err := setDeviceOnlineStatus(ov.Id, true)
+		err := util.SetDeviceOnlineStatus(ov.Id, true)
 		if err != nil {
 			mqtt.ReplayToDevice(ov.Id, response.GetMqttFailResponses("上线失败", ov.EventId, errorCode.ERR_SVR_INTERNAL))
 		}
@@ -119,8 +120,8 @@ func DeviceOfflineByMqttHandle(client mq.Client, message mq.Message) {
 		return
 	}
 
-	if isRegisterThing(ov.Id) {
-		err := setDeviceOnlineStatus(ov.Id, false)
+	if util.IsRegisterThing(ov.Id) {
+		err := util.SetDeviceOnlineStatus(ov.Id, false)
 		if err != nil {
 			Log.E()("设备下线失败，但是已经离线", err.Error(), "ID:", ov.Id)
 			return

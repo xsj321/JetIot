@@ -1,4 +1,4 @@
-package thing
+package thingServer
 
 import (
 	"JetIot/util/Log"

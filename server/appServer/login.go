@@ -1,4 +1,4 @@
-package accountSystem
+package appServer
 
 import (
 	"JetIot/model/account"
