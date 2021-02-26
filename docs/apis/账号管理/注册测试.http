@@ -1,8 +1,8 @@
-POST http://127.0.0.1:8080/app/account/register
+POST http://127.0.0.1:8080/account/register
 Content-Type: application/json
 
 {
-  "account":"123@13.com",
+  "account":"123w@13.com",
   "password":"123",
   "name": "123",
   "type": 0

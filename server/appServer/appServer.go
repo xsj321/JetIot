@@ -249,5 +249,5 @@ func GetThingComponentValue(context *gin.Context) {
 	}
 	res := thing.Components[ov.ComponentName].Call()
 	ov.Value = res
-	context.JSON(http.StatusOK, response.GetSuccessResponses("修改完成", ov))
+	context.JSON(http.StatusOK, response.GetSuccessResponses("查询成功", ov))
 }

@@ -37,11 +37,11 @@ func Login(context *gin.Context) {
 	}
 	resTrue := res.(*account.Account)
 	if resTrue.Password == param.Password && resTrue.Account == resTrue.Account {
-		context.JSON(http.StatusOK, response.GetSuccessResponses("登录成功"))
+		context.JSON(http.StatusOK, response.GetSuccessResponses("login_succeed"))
 		return
 	}
 	context.JSON(http.StatusOK, response.GetFailResponses(
-		"登录失败",
+		"login_error",
 		errorCode.ERR_MYSQL_FAILED,
 	))
 }
@@ -82,6 +82,6 @@ func Register(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, response.GetSuccessResponses("注册成功"))
+	context.JSON(http.StatusOK, response.GetSuccessResponses("reg_succeed"))
 
 }
