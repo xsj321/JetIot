@@ -124,6 +124,7 @@ func DealEventHandle(client mq.Client, message mq.Message) {
  */
 func ShouldBindJSON(message mq.Message, model interface{}) error {
 	payload := message.Payload()
+	Log.D()(string(payload))
 	err := json.Unmarshal(payload, model)
 	return err
 }

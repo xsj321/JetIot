@@ -251,3 +251,29 @@ func GetThingComponentValue(context *gin.Context) {
 	ov.Value = res
 	context.JSON(http.StatusOK, response.GetSuccessResponses("查询成功", ov))
 }
+
+func GetThingAllValue(context *gin.Context) {
+	ov := thingModel.ThingInitOV{}
+	err := context.ShouldBindJSON(&ov)
+	if err != nil {
+		Log.E()("参数解析错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	thing, err := util.LoadThing(ov.Id)
+	if err != nil {
+		Log.E()("加载错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"加载错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+	res, _ := json.Marshal(thing)
+	//ov.Value = res
+	context.JSON(http.StatusOK, response.GetSuccessResponses("查询成功", string(res)))
+}

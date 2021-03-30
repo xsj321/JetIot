@@ -36,6 +36,7 @@ func runHttpServer() {
 	thingGroup.POST("register", appServer.RegisterThing)
 	thingGroup.POST("setThingComponentValue", appServer.SetThingComponentValue)
 	thingGroup.POST("getThingComponentValue", appServer.GetThingComponentValue)
+	thingGroup.POST("getThingAllValue", appServer.GetThingAllValue)
 	thingGroup.POST("bindingDevice", appServer.BindingDevice)
 	thingGroup.POST("unbindingDevice", appServer.UnBindingDevice)
 	thingGroup.POST("getDeviceListByAccount", appServer.GetDeviceInfoListByAccount)
