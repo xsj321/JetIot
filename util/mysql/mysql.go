@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"JetIot/conf"
+	"JetIot/model/account"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"time"
@@ -41,6 +42,21 @@ func Find(table string, query interface{}, columns ...string) (interface{}, erro
 		err = Conn.Table(table).Select(columns).Where(query).Scan(query).Error
 	}
 	return query, err
+}
+
+func FindAllAccount() []account.Account {
+	//var err error
+	//if len(columns) == 0 {
+	//	err = Conn.Table(table).Scan("*").Error
+	//} else {
+	//	err = Conn.Table(table).Select(columns).Scan(columns).Error
+	//}
+	//return query, err
+
+	a := make([]account.Account, 0)
+	Conn.Table("accounts").Select([]string{"account", "name"}).Scan(&a)
+	return a
+
 }
 
 /**

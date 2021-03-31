@@ -45,6 +45,7 @@ func runHttpServer() {
 	accountGroup := engine.Group("account")
 	accountGroup.POST("login", appServer.Login)
 	accountGroup.POST("register", appServer.Register)
+	accountGroup.POST("listAccount", appServer.ListAccount)
 	err := engine.Run()
 
 	if err != nil {

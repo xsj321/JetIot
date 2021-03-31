@@ -85,3 +85,24 @@ func Register(context *gin.Context) {
 	context.JSON(http.StatusOK, response.GetSuccessResponses("reg_succeed"))
 
 }
+
+func ListAccount(context *gin.Context) {
+	param := account.Account{}
+	err := context.ShouldBindJSON(&param)
+	if err != nil {
+		Log.E()("参数解析错误")
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	allAccount := mysql.FindAllAccount()
+
+	for _, a := range allAccount {
+		Log.D()(a.Account)
+	}
+	context.JSON(http.StatusOK, response.GetSuccessResponses("succeed", allAccount))
+
+}
