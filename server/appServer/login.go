@@ -6,6 +6,7 @@ import (
 	"JetIot/util/Log"
 	"JetIot/util/errorCode"
 	"JetIot/util/mysql"
+	"JetIot/util/redis"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -81,7 +82,8 @@ func Register(context *gin.Context) {
 		))
 		return
 	}
-
+	key := redis.FRIEND_ALL
+	redis.SAdd(key, param.Account)
 	context.JSON(http.StatusOK, response.GetSuccessResponses("reg_succeed"))
 
 }
@@ -104,5 +106,105 @@ func ListAccount(context *gin.Context) {
 		Log.D()(a.Account)
 	}
 	context.JSON(http.StatusOK, response.GetSuccessResponses("succeed", allAccount))
+
+}
+
+func AddFriend(context *gin.Context) {
+	param := account.AddFriendOV{}
+	err := context.ShouldBindJSON(&param)
+	if err != nil {
+		Log.E()("参数解析错误")
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	err = mysql.Conn.Table("friends_call").Create(param).Error
+	if err != nil {
+		Log.E()(err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"添加好友失败，系统错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	context.JSON(http.StatusOK, response.GetSuccessResponses("发送好友申请成功"))
+}
+
+func AcceptFriend(context *gin.Context) {
+	param := account.AddFriendOV{}
+	err := context.ShouldBindJSON(&param)
+	if err != nil {
+		Log.E()("参数解析错误")
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	//err = mysql.Conn.Table("friends_call").Select("param").Scan(&param).Error
+	//if err != nil {
+	//	Log.E()(err.Error())
+	//	context.JSON(http.StatusOK, response.GetFailResponses(
+	//		"确认添加好友失败，系统错误",
+	//		errorCode.ERR_SVR_INTERNAL,
+	//	))
+	//	return
+	//}
+
+	err = mysql.Conn.Table("friends_call").
+		Where("source_user = ? and target_user = ?", param.SourceUser, param.TargetUser).
+		Update("status", 1).Error
+
+	if err != nil {
+		Log.E()(err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"确认添加好友失败，系统错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	//添加相互的好友缓存
+	redis.SAdd(param.SourceUser+":"+redis.FRIEND_LIST, param.TargetUser)
+	redis.SAdd(param.TargetUser+":"+redis.FRIEND_LIST, param.SourceUser)
+
+	context.JSON(http.StatusOK, response.GetSuccessResponses("好友添加成功"))
+
+}
+
+func GetFriendList(context *gin.Context) {
+	param := account.Account{}
+	err := context.ShouldBindJSON(&param)
+	if err != nil {
+		Log.E()("参数解析错误")
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	nowUser := param.Account
+
+	members, err := redis.SMembers(nowUser + ":" + redis.FRIEND_LIST)
+
+	if err != nil {
+		Log.E()("查找用户好友列表失败（redis错误）")
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"查找用户好友列表失败（redis错误）",
+			errorCode.ERR_REDIS_FAILED,
+		))
+		return
+	}
+
+	for _, a := range members {
+		Log.D()(a)
+	}
+	context.JSON(http.StatusOK, response.GetSuccessResponses("查询好友列表成功", members))
 
 }

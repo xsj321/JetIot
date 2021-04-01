@@ -13,3 +13,9 @@ type BindingDevice struct {
 	DeviceId   string `json:"device_id"`
 	CreateTime string `json:"create_time"`
 }
+
+type AddFriendOV struct {
+	SourceUser string `json:"source_user"`
+	TargetUser string `json:"target_user"`
+	Status     string `json:"status"`
+}

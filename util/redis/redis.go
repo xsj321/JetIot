@@ -7,6 +7,12 @@ import (
 
 var redisDb *redis.Client
 
+const (
+	FRIEND_ALL  = "all_user_list"
+	FRIEND_LIST = "friend_list"
+	GROUP_LIST  = "group_list"
+)
+
 func InitRedis() {
 	redisDb = redis.NewClient(&redis.Options{
 		Addr:     conf.Default.RedisServer + ":" + conf.Default.RedisPort, // use default Addr
@@ -28,4 +34,14 @@ func Get(key string) ([]byte, error) {
 func Del(key string) error {
 	err := redisDb.Del(key).Err()
 	return err
+}
+
+func SAdd(key string, value interface{}) {
+	redisDb.SAdd(key, value)
+}
+
+func SMembers(key string) ([]string, error) {
+	members := redisDb.SMembers(key)
+	result, err := members.Result()
+	return result, err
 }
