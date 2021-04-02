@@ -49,6 +49,7 @@ func runHttpServer() {
 	accountGroup.POST("addFriend", appServer.AddFriend)
 	accountGroup.POST("acceptFriend", appServer.AcceptFriend)
 	accountGroup.POST("getFriendList", appServer.GetFriendList)
+	accountGroup.POST("getFriendRequestList", appServer.GetFriendRequestList)
 	err := engine.Run()
 
 	if err != nil {

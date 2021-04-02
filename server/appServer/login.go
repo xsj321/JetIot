@@ -208,3 +208,36 @@ func GetFriendList(context *gin.Context) {
 	context.JSON(http.StatusOK, response.GetSuccessResponses("查询好友列表成功", members))
 
 }
+
+func GetFriendRequestList(context *gin.Context) {
+	param := account.Account{}
+	err := context.ShouldBindJSON(&param)
+	if err != nil {
+		Log.E()("参数解析错误")
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	nowUser := param.Account
+
+	requestList := new([]account.AddFriendOV)
+	err = mysql.Conn.Table("friends_call").Where("target_user = ? and status = 0", nowUser).Scan(requestList).Error
+
+	if err != nil {
+		Log.E()("查找用户好友申请列表失败（MySql错误）")
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"查找用户好友申请列表失败（MySql错误）",
+			errorCode.ERR_MYSQL_FAILED,
+		))
+		return
+	}
+
+	for _, a := range *requestList {
+		Log.D()(a.TargetUser)
+	}
+	context.JSON(http.StatusOK, response.GetSuccessResponses("查询好友申请列表成功", *requestList))
+
+}
