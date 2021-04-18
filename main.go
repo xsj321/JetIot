@@ -43,6 +43,7 @@ func runHttpServer() {
 
 	//智慧园区专属API
 	thingGroup.POST("getCoverListByLocation", appServer.GetCoverListByLocation)
+	thingGroup.POST("fixCoverWaring", appServer.FixCoverWaring)
 
 	//账号管理
 	accountGroup := engine.Group("account")

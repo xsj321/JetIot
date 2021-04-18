@@ -16,6 +16,10 @@ type CoverOV struct {
 	Place string `json:"place"`
 }
 
+type CoverFixOV struct {
+	Id int `json:"id"`
+}
+
 type CoverResOV struct {
 	WaringList []Cover `json:"waring_list"`
 	Detail     []Cover `json:"detail"`

@@ -44,9 +44,8 @@ func GetCoverListByLocation(context *gin.Context) {
 	detail := make([]park.Cover, 0)
 
 	for _, cover := range coverList {
-		if cover.Waring == 0 {
-			detail = append(detail, cover)
-		} else {
+		detail = append(detail, cover)
+		if cover.Waring == 1 {
 			waring = append(waring, cover)
 		}
 	}
@@ -59,6 +58,38 @@ func GetCoverListByLocation(context *gin.Context) {
 	context.JSON(
 		http.StatusOK,
 		response.GetSuccessResponses("获取数据列表成功", resOV),
+	)
+
+}
+
+//修复井盖
+func FixCoverWaring(context *gin.Context) {
+	ov := park.CoverFixOV{}
+	err := context.ShouldBindJSON(&ov)
+	if err != nil {
+		Log.E()("参数解析错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"参数解析错误",
+			errorCode.ERR_SVR_INTERNAL,
+		))
+		return
+	}
+
+	Log.D()("请求修复ID为:", ov.Id)
+
+	err = mysql.Conn.Table("cover_status").Where("id = ?", ov.Id).Update("waring", 0).Error
+	if err != nil {
+		Log.E()("数据库更新错误" + err.Error())
+		context.JSON(http.StatusOK, response.GetFailResponses(
+			"数据库更新错误",
+			errorCode.ERR_MYSQL_FAILED,
+		))
+		return
+	}
+
+	context.JSON(
+		http.StatusOK,
+		response.GetSuccessResponses("修复井盖成功"),
 	)
 
 }
