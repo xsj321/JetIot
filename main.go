@@ -41,6 +41,9 @@ func runHttpServer() {
 	thingGroup.POST("unbindingDevice", appServer.UnBindingDevice)
 	thingGroup.POST("getDeviceListByAccount", appServer.GetDeviceInfoListByAccount)
 
+	//智慧园区专属API
+	thingGroup.POST("getCoverListByLocation", appServer.GetCoverListByLocation)
+
 	//账号管理
 	accountGroup := engine.Group("account")
 	accountGroup.POST("login", appServer.Login)
