@@ -217,6 +217,11 @@ func GetDeviceInfoListByAccount(context *gin.Context) {
 			))
 			return
 		}
+		if util.GetDeviceOnlineStatus(s.DeviceId) {
+			thing.OnLine = true
+		} else {
+			thing.OnLine = false
+		}
 		thingList = append(thingList, *thing)
 	}
 

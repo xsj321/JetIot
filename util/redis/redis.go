@@ -3,6 +3,7 @@ package redis
 import (
 	"JetIot/conf"
 	"github.com/go-redis/redis"
+	"time"
 )
 
 var redisDb *redis.Client
@@ -23,6 +24,11 @@ func InitRedis() {
 
 func Set(key string, value interface{}) error {
 	err := redisDb.Set(key, value, 0).Err()
+	return err
+}
+
+func SetWithExpiration(key string, value interface{}, exp time.Duration) error {
+	err := redisDb.Set(key, value, time.Second*exp).Err()
 	return err
 }
 

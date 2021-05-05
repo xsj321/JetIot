@@ -23,14 +23,15 @@ func InitMqttClient() {
 		SetClientID(conf.Default.MqttClientID).
 		SetUsername(conf.Default.MqttUserName).
 		SetPassword(conf.Default.MqttPassword).
-		SetWill("server_will", "lose_connect", 2, false)
+		SetWill("server_will", "lose_connect", 1, false).
+		SetCleanSession(true)
 
 	Client = mq.NewClient(opts)
 	if token := Client.Connect(); token.Wait() && token.Error() != nil {
 		Log.E()("初始化Mqtt客户端失败" + token.Error().Error())
 		return
 	}
-	Client.Publish("server_will", 2, true, "server_start")
+	Client.Publish("server_will", 1, true, "server_start")
 	Log.I()("初始化Mqtt客户端完成")
 
 }

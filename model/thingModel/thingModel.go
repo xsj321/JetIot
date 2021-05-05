@@ -10,6 +10,7 @@ type Thing struct {
 	BaseInfo
 	Id         string                `json:"id"`
 	Name       string                `json:"name"`
+	OnLine     bool                  `json:"on_line"`
 	Components map[string]*Component `json:"components"`
 }
 

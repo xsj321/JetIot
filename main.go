@@ -22,6 +22,7 @@ func initEvn() {
 	mysql.InitDB()
 	redis.InitRedis()
 	mqtt.InitMqttClient()
+	thingServer.InitComponentHooks()
 	mqtt.Publish("server/status", "restart")
 }
 
@@ -66,7 +67,13 @@ func runMqttServer() {
 	mqtt.RegisterEventHandle(event.EVENT_COMPONENT_CHANGE_VALUE, "更新设备组件数据", thingServer.SetThingComponentValueByMqttHandle)
 	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_ONLIONE, "设备上线初始化", thingServer.DeviceOnlineByMqttHandle)
 	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_OFFLIONE, "设备离线遗嘱", thingServer.DeviceOfflineByMqttHandle)
+	mqtt.RegisterEventHandle(event.EVENT_THING_DEVICE_HEATBEAT, "设备心跳", thingServer.DeviceHeatByMqttHandle)
 	mqtt.EventListenStart()
+
+	//添加事件钩子
+
+	//井盖事件钩子
+	thingServer.AddComponentHook("cover", thingServer.UpdateCoverStatusHook)
 }
 
 func main() {

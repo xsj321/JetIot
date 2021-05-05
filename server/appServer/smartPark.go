@@ -3,6 +3,7 @@ package appServer
 import (
 	"JetIot/model/park"
 	"JetIot/model/response"
+	"JetIot/util"
 	"JetIot/util/Log"
 	"JetIot/util/errorCode"
 	"JetIot/util/mysql"
@@ -60,6 +61,32 @@ func GetCoverListByLocation(context *gin.Context) {
 		response.GetSuccessResponses("获取数据列表成功", resOV),
 	)
 
+}
+
+/**
+ * @Description: 获取当前井盖的状态
+ * @param id 设备ID
+ * @return bool 井盖状态 true：正常 false：异常
+ */
+func GetCoverStatus(id string) bool {
+	thing, err := util.LoadThing(id)
+	if err != nil {
+		Log.E()("加载物模型错误" + err.Error())
+		return false
+	}
+	cover := thing.Components["cover"]
+	coverStatus := cover.Value.(bool)
+
+	//var coverStatus int
+	//err := mysql.Conn.Table("cover_status").Select("waring").Where("device_id = ?", id).Scan(&coverStatus).Error
+	//if err != nil {
+	//	Log.E()("数据库查询错误" + err.Error())
+	//	return false
+	//}
+	if coverStatus {
+		return true
+	}
+	return false
 }
 
 //修复井盖

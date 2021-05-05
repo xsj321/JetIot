@@ -73,6 +73,13 @@ func SetThingComponentValueByMqttHandle(client mq.Client, message mq.Message) {
 		Log.E()("更新缓存错误" + err.Error())
 		return
 	}
+	if hook, has := ComponentHooks[ov.ComponentName]; has {
+		Log.D()("执行Hook:", hook.ComponentName)
+		hook.ComponentHookFuc(ov)
+	} else {
+		Log.I()("Hook:", hook.ComponentName, "ID:", ov.Id, "未找到")
+	}
+
 }
 
 /**
@@ -124,6 +131,29 @@ func DeviceOfflineByMqttHandle(client mq.Client, message mq.Message) {
 		err := util.SetDeviceOnlineStatus(ov.Id, false)
 		if err != nil {
 			Log.E()("设备下线失败，但是已经离线", err.Error(), "ID:", ov.Id)
+			return
+		}
+	} else {
+		Log.E()("未注册设备")
+		return
+	}
+
+}
+
+// 设备心跳
+func DeviceHeatByMqttHandle(client mq.Client, message mq.Message) {
+	Log.D()("心跳内容", string(message.Payload()))
+	ov := thingModel.ThingInitOV{}
+	err := mqtt.ShouldBindJSON(message, &ov)
+	if err != nil {
+		Log.E()("参数解析错误" + err.Error())
+		return
+	}
+
+	if util.IsRegisterThing(ov.Id) {
+		err := util.UpdateDeviceOnLineStatus(ov.Id)
+		if err != nil {
+			Log.E()("设备心跳失败", err.Error(), "ID:", ov.Id)
 			return
 		}
 	} else {

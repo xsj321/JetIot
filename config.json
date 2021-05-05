@@ -9,5 +9,6 @@
   "mqtt_port":"1883",
   "mqtt_client_id":"main_server",
   "mqtt_user_name":"admin",
-  "mqtt_password":"public"
+  "mqtt_password":"public",
+  "mqtt_heat_beat_time":5
 }
