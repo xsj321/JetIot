@@ -8,7 +8,7 @@ type BaseInfo struct {
 
 type Thing struct {
 	BaseInfo
-	Id         string                `json:"id"`
+	ID         string                `json:"id" gorm:"primaryKey"`
 	Name       string                `json:"name"`
 	OnLine     bool                  `json:"on_line"`
 	Components map[string]*Component `json:"components"`

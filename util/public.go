@@ -1,14 +1,12 @@
 package util
 
 import (
-	"JetIot/conf"
 	"JetIot/model/account"
 	"JetIot/model/thingModel"
 	"JetIot/util/Log"
 	"JetIot/util/mysql"
 	"JetIot/util/redis"
 	"encoding/json"
-	"time"
 )
 
 func LoadThing(id string) (*thingModel.Thing, error) {
@@ -32,7 +30,7 @@ func Commit(thing *thingModel.Thing) error {
 	marshal, _ := json.Marshal(*thing)
 	Log.D()(string(marshal))
 	//保存到缓存库
-	err := redis.Set("thingServer:"+thing.Id, string(marshal))
+	err := redis.Set("thingServer:"+thing.ID, string(marshal))
 	if err != nil {
 		Log.E()("保存到缓存库错误" + err.Error())
 		return err
@@ -80,16 +78,6 @@ func GetDeviceOnlineStatus(id string) bool {
 		return false
 	}
 	return true
-}
-
-// 更新设备在线状态
-func UpdateDeviceOnLineStatus(id string) error {
-	err := redis.SetWithExpiration("thingServer:online_status:"+id, 1, time.Duration(conf.Default.MqttHeatBeatTime))
-	if err != nil {
-		Log.E()(id, "更新设备状态错误", err)
-		return err
-	}
-	return nil
 }
 
 /**

@@ -1,7 +1,0 @@
-POST http://127.0.0.1:8080/app/thing/getThingComponentValue
-Content-Type: application/json
-
-{
-  "id": "33322",
-  "component_name": "cover"
-}

@@ -8,18 +8,12 @@ import (
 )
 
 type Config_t struct {
-	RedisServer      string `json:"redis_server"`
-	RedisPort        string `json:"redis_port"`
-	RedisPassword    string `json:"redis_password"`
-	MysqlServer      string `json:"mysql_server"`
-	MysqlPort        string `json:"mysql_port"`
-	MysqlPassword    string `json:"mysql_password"`
-	MqttServer       string `json:"mqtt_server"`
-	MqttPort         string `json:"mqtt_port"`
-	MqttClientID     string `json:"mqtt_client_id"`
-	MqttUserName     string `json:"mqtt_user_name"`
-	MqttPassword     string `json:"mqtt_password"`
-	MqttHeatBeatTime int    `json:"mqtt_heat_beat_time"`
+	RedisServer   string `json:"redis_server"`
+	RedisPort     string `json:"redis_port"`
+	RedisPassword string `json:"redis_password"`
+	MysqlServer   string `json:"mysql_server"`
+	MysqlPort     string `json:"mysql_port"`
+	MysqlPassword string `json:"mysql_password"`
 }
 
 var (

@@ -1,6 +1,0 @@
-POST http://101.37.86.133:8080/app/thing/getCoverListByLocation
-Content-Type: application/json
-
-{
-  "place": ""
-}
