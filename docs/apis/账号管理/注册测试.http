@@ -1,0 +1,11 @@
+POST http://127.0.0.1:8080/account/register
+Content-Type: application/json
+
+{
+  "account":"cool@outlook.com",
+  "password":"cool",
+  "name": "cool",
+  "type": 0
+}
+
+###
